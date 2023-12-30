@@ -1,0 +1,20 @@
+Developer log of ICPC Management System：
+@No.1
+困难：在结构体Team的定义中为了按通过时间给problem_set排序，定义了比较函数CompareProblem，但由于problem_set是非静态变量而报错。
+解决方案：不给problem_set排序，转而定义一个submit_time_rank_list：set存储所有问题的通过时间并降序排序，在rank_list：set的比较函数中调用submit_time_rank_list。
+@No.2
+困难：在滚榜时用迭代器遍历时Runtime_Error，原因是rank_list.erase(iter)执行完后iter失效。
+解决方案：将erase函数的返回值重新赋给iter，然后iter在insert执行完后且确定排名不变时再执行--操作，防止iter正好是rank_list.begin()。
+@No.3
+困难：然而以上方法并不是完美的，当iter == rank_list.begin()时再--就会出错。
+解决方案：每次取iter = --rank_list.end()（最后一个元素），对此队伍进行解冻，若排名有变化则continue，若该队伍所有问题都解冻了排名还是最后一名则
+        代表此队伍在滚榜结束前都是最后一名，就先把这支队伍踢出rank_list，然后continue。最后当rank_list为空时再把所有队伍加入回来。
+@No.4
+困难：提交后第14个数据点WA。
+解决方案：偶然发现用set存submit_time没有考虑到重复，所以改用multiset存储。（然而multiset有点慢）
+@N0.5
+困难：15~20个数据点TLE，时间均超过10000ms。
+解决方案：在set的比较函数CompareTeam中也要引用地址，防止多次调用map浪费时间。
+@No.6
+困难：
+解决方案：
